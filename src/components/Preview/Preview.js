@@ -1,0 +1,22 @@
+import React from 'react';
+
+import usePreview from './usePreview';
+
+const Preview = () => {
+  const { svg } = usePreview();
+
+  return (
+    <div>
+      <div className="mb-2">
+        <span>Preview</span>
+      </div>
+      <div className="d-flex">
+        <div style={{ border: "1px solid black", height: "402px", width: "402px", overflow: "scroll" }}>
+          {svg}
+        </div>
+      </div>
+    </div>
+  )
+};
+
+export default Preview;

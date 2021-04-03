@@ -8,7 +8,7 @@ export default function useSpecInputs() {
   const dispatch = (action) => {
     setSpecs({
       ...specs,
-      [action.type]: action.payload
+      [action.type]: Number(action.payload)
     });
   }
 
