@@ -48,6 +48,8 @@ export default function usePreview() {
         </svg>
       )
       setSvg(newSvg);
+    } else {
+      setSvg(null);
     }
   }, [coors]);
 

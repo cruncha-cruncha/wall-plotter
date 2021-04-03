@@ -1,2 +1,5 @@
-export * from './ready';
+export * from './specsReady';
+export * from './specErrors';
 export * from './realCoors';
+export * from './coorsReady';
+export * from './coorErrors';

@@ -2,13 +2,15 @@ import { useRecoilValue } from 'recoil';
 
 import { fileContentState } from '../ImageHandler/state';
 import { specsState } from '../SpecInputs/state';
-import { readyState } from './state';
+import { specErrorsState, coorsReadyState, coorErrorsState } from './state';
 
 export default function useConverter() {
-  const specs = useRecoilValue(specsState);
+  const specsAlpha = useRecoilValue(specsState);
   const fileContent = useRecoilValue(fileContentState);
-  const ready = useRecoilValue(readyState);
-
+  const coorsReady = useRecoilValue(coorsReadyState);
+  const specErrors = useRecoilValue(specErrorsState);
+  const coorErrors = useRecoilValue(coorErrorsState);
+  
   const mmToCm = (mm) => mm / 10;
   const mmToM = (mm) => mm / 1000;
   const cmToMm = (cm) => cm * 10;
@@ -17,11 +19,16 @@ export default function useConverter() {
   const mToCm = (m) => m * 100;
 
   const go = () => {
-    if (ready) {
+    if (coorsReady) {
+      const specs = Object.keys(specsAlpha).reduce((out, k) => ({
+        ...out,
+        [k]: Number(specsAlpha[k])
+      }), {});
+
       const parser = new DOMParser();
       const dom = parser.parseFromString(fileContent, "application/xml");
 
-      const mySvg = Array.from(dom.querySelectorAll("svg"))[0];
+      const mySvg = dom.querySelector("svg");
       const [minX, minY, width, height] = mySvg.getAttribute("viewBox").split(" ");
       console.log("inner svg dimensions", minX, minY, width, height);
 
@@ -35,8 +42,9 @@ export default function useConverter() {
 
       const pathToCartesianCoors = (path) => {
         const out = [];
-        const totalMM = unitToMm(path.getTotalLength());
-        for (let i = 0; i < totalMM; i++) {
+        const total = unitToMm(path.getTotalLength());
+        // change to while, and don't use ++. Use something like + spec['output-resolution]'
+        for (let i = 0; i < total; i++) {
           out.push(path.getPointAtLength(mmToUnit(i)));
         }
         return out;
@@ -59,13 +67,13 @@ export default function useConverter() {
       } else {
         console.log("svg has no paths");
       }
-    } else {
-      console.log("not ready");
     }
   }
   
   return {
-    ready,
+    specErrors,
+    coorErrors,
+    ready: coorsReady,
     go
   };
 }

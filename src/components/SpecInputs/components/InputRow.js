@@ -3,7 +3,7 @@ import { Label, Input } from 'reactstrap';
 
 const InputRow = ({ label, actionType, specs, dispatch }) => {
 
-  const fV = (val) => Number(val).toString();
+  const fV = (val) => val; //Number(val).toString();
 
   return (
     <div className="row mb-3">
