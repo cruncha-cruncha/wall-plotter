@@ -16,7 +16,7 @@ export const BOUNDS = {
     upper: 1000,
     lower: 1
   },
-  'spool-to-spool': {
+  'eye-to-eye': {
     upper: 1000,
     lower: 1
   },
@@ -91,7 +91,7 @@ export const specErrorsState = selector({
       if (
         specs['initial-coors-x'] +
         (specs['tool-offset-x'] * 2) >
-        specs['spool-to-spool']
+        specs['eye-to-eye']
       ) {
         return { msg: 'Specs are not physically valid' };
       }

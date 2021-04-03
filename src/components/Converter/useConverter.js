@@ -106,12 +106,6 @@ export default function useConverter() {
         const W = { l: -1, r: -1 };
         const NW = { l: -1, r: 0 };
 
-        // This isn't going to work
-        // Not sure how to solve new position after motor rotates
-        // Force strings to go through an eyelet or pulley so they always come out at the same place
-        // keep spool-diameter, change spool-to-spool to eyelet-to-eyelet
-        // "specify by distance from spools" calculation will have to change
-
         while (true) {
           if (eD(a, current) < eD(b, current)) {
             return current;
@@ -162,10 +156,6 @@ export default function useConverter() {
       // 0: do nothing
       // -1: step counter-clockwise
 
-      // FEED RATE??
-      // have option to export/import here, so all the expensive and slow stuff doesn't have to be run again
-      // shouldn't be able to set specs if they haven't been used yet (for example: step resolution)
-      // also I think storing points makes more sense than lengths. Remember to carry error when building moves
 
       // somehow make it available for download?
       setOutput({});
