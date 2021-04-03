@@ -9,6 +9,8 @@ export const coorErrorsState = selector({
 
     if (!realCoors) {
       return { msg: 'Specs are not physically valid' };
+    } else if (realCoors.outputRect.x + realCoors.outputRect.width > realCoors.rightEye.x) {
+      return { msg: 'Can\'t draw outside vertical bounds of eyes' };
     } else {
       return null;
     }

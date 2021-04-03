@@ -96,66 +96,19 @@ export default function useConverter() {
 
       const slope = (a, b) => (b.y - a.y) / (b.x - a.x);
 
-      const traverse = (a, b, current) => {
-        const N = { l: -1, r: 1 };
-        const NE = { l: 0, r: 1 };
-        const E = { l: 1, r: 1 };
-        const SE = { l: 1, r: 0 };
-        const S = { l: 1, r: -1 };
-        const SW = { l: 0, r: -1 };
-        const W = { l: -1, r: -1 };
-        const NW = { l: -1, r: 0 };
+      const traverse = (current, desired) => {
 
-        while (true) {
-          if (eD(a, current) < eD(b, current)) {
-            return current;
-          }
+        // calculate how many steps it takes to lengthen the string by a mm (this can be done outside)
+        // solve for lengths at desired
+        // round find delta lengths in mm, convert to steps, round to nearest
+        // move there, return new position
 
-          if (current.x === b.x) {
-            if (current.y > b.y) {
-              // move S
-            } else {
-              // move N
-            }
-          } 
-
-          const m = slope(current, b);
-          if (current.x < b.x) {
-            if (slope > 0) {
-              // move N, NE, or E
-            } else {
-              // move E, SE, or S
-            }
-          } else {
-            if (slope > 0) {
-              // move S, SW, or W
-            } else {
-              // move W, NW, or N
-            }
-          }
-        }
       }
-      
-
-      /*
-      l   r
-
-      1   1
-      1   0
-      1   -1
-      0   1
-      0   0   <- invalid
-      0   -1
-      -1  1
-      -1  0
-      -1  -1
-      */
 
       // at each interval, set left and right move:
       // 1: step clockwise
       // 0: do nothing
       // -1: step counter-clockwise
-
 
       // somehow make it available for download?
       setOutput({});
