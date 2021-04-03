@@ -4,9 +4,10 @@ export const specsState = atom({
   key: "specs",
   default: {
     'step-resolution': '1.8',
+    'feed-rate': '1',
     'final-height': '60',
-    'spool-to-spool': '150',
     'spool-diameter': '4',
+    'eye-to-eye': '150',
     'specify-start-by-coors': false,
     'initial-length-left': '42',
     'initial-length-right': '124',

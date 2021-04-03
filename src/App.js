@@ -5,6 +5,7 @@ import ImageHandler from './components/ImageHandler';
 import SpecInputs from './components/SpecInputs';
 import Converter from './components/Converter';
 import Preview from './components/Preview';
+import ConversionProgress from './components/ConversionProgress';
 
 import './App.scss';
 
@@ -16,6 +17,7 @@ function App() {
           <div className="col-lg-6">
             <ImageHandler />
             <Preview />
+            <ConversionProgress />
           </div>
           <div className="col-lg-6">
             <SpecInputs />

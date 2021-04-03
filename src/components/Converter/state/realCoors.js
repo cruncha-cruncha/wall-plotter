@@ -34,8 +34,8 @@ export const realCoorsState = selector({
     if (specs['specify-start-by-coors']) {
       return {
         spoolDiameter: specs['spool-diameter'],
-        leftSpool: { x: 0, y: 0 },
-        rightSpool: { x: specs['spool-to-spool'], y: 0 },
+        leftEye: { x: 0, y: 0 },
+        rightEye: { x: specs['eye-to-eye'], y: 0 },
         leftLine: {
           start: { x: 0, y: 0 },
           end: {
@@ -43,7 +43,7 @@ export const realCoorsState = selector({
             y: specs['initial-coors-y'] - specs['tool-offset-y'] }
         },
         rightLine: {
-          start: { x: specs['spool-to-spool'], y: 0 },
+          start: { x: specs['eye-to-eye'], y: 0 },
           end: {
             x: specs['initial-coors-x'] + specs['tool-offset-x'],
             y: specs['initial-coors-y'] - specs['tool-offset-y']
@@ -55,14 +55,14 @@ export const realCoorsState = selector({
           width: mmToCm(unitToMm(width)),
           height: mmToCm(unitToMm(height))
         },
-        totalWidth: specs['spool-to-spool'],
+        totalWidth: specs['eye-to-eye'],
         totalHeight: specs['initial-coors-y'] + mmToCm(unitToMm(height))
       }
     } else {
-      // spool-to-spool = sqrt(initial-length-left^2 - y^2) + (tool-offset-x * 2) + sqrt(initial-length-right^2 - y^2)
+      // eye-to-eye = sqrt(initial-length-left^2 - y^2) + (tool-offset-x * 2) + sqrt(initial-length-right^2 - y^2)
       // solve for y
 
-      const n1 = specs['spool-to-spool'] - (specs['tool-offset-x'] * 2);
+      const n1 = specs['eye-to-eye'] - (specs['tool-offset-x'] * 2);
       const n2 = Math.pow(specs['initial-length-right'], 2) - Math.pow(specs['initial-length-left'], 2) - Math.pow(n1, 2);
 
       const a = 4 * Math.pow(n1, 2);
@@ -72,7 +72,7 @@ export const realCoorsState = selector({
       const leftY2 = Math.sqrt(-4 * a * c) / (2 * a);
       const rightY2 = leftY2;
       const leftX2 = Math.sqrt(Math.pow(specs['initial-length-left'], 2) - Math.pow(leftY2, 2));
-      const rightX2 = specs['spool-to-spool'] - Math.sqrt(Math.pow(specs['initial-length-right'], 2) - Math.pow(rightY2, 2));
+      const rightX2 = specs['eye-to-eye'] - Math.sqrt(Math.pow(specs['initial-length-right'], 2) - Math.pow(rightY2, 2));
 
       if (isNaN(leftY2) || isNaN(rightY2) || isNaN(leftX2) || isNaN(rightX2)) {
         return null;
@@ -84,14 +84,14 @@ export const realCoorsState = selector({
 
       return {
         spoolDiameter: specs['spool-diameter'],
-        leftSpool: { x: 0, y: 0 },
-        rightSpool: { x: specs['spool-to-spool'], y: 0 },
+        leftEye: { x: 0, y: 0 },
+        rightEye: { x: specs['eye-to-eye'], y: 0 },
         leftLine: {
           start: { x: 0, y: 0 },
           end: { x: leftX2, y: leftY2 }
         },
         rightLine: {
-          start: { x: specs['spool-to-spool'], y: 0 },
+          start: { x: specs['eye-to-eye'], y: 0 },
           end: { x: rightX2, y: rightY2 }
         },
         outputRect: {
@@ -100,7 +100,7 @@ export const realCoorsState = selector({
           width: mmToCm(unitToMm(width)),
           height: mmToCm(unitToMm(height))
         },
-        totalWidth: specs['spool-to-spool'],
+        totalWidth: specs['eye-to-eye'],
         totalHeight: leftY2 + specs['tool-offset-y'] + mmToCm(unitToMm(height))
       }
     } 

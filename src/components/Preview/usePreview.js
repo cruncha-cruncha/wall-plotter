@@ -36,13 +36,13 @@ export default function usePreview() {
             height={coors.outputRect.height}
             style={{ fill: "blue" }} />
           <circle
-            cx={coors.leftSpool.x}
-            cy={coors.leftSpool.y}
+            cx={coors.leftEye.x}
+            cy={coors.leftEye.y}
             r={coors.spoolDiameter / 2}
             fill="black" />
           <circle
-            cx={coors.rightSpool.x}
-            cy={coors.rightSpool.y}
+            cx={coors.rightEye.x}
+            cy={coors.rightEye.y}
             r={coors.spoolDiameter / 2}
             fill="black" />
         </svg>
