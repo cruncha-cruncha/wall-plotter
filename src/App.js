@@ -6,7 +6,7 @@ import SpecInputs from './components/SpecInputs';
 import Converter from './components/Converter';
 import Preview from './components/Preview';
 
-import './App.css';
+import './App.scss';
 
 function App() {
   return (
