@@ -6,7 +6,7 @@ const Preview = () => {
   const { svg } = usePreview();
 
   return (
-    <div>
+    <div className="mb-4">
       <div className="mb-2">
         <span>Preview</span>
       </div>
