@@ -4,7 +4,7 @@ import { Button } from 'reactstrap';
 import useConverter from './useConverter';
 
 const Converter = () => {
-  const { specErrors, coorErrors, ready, go } = useConverter();
+  const { specErrors, coorErrors, ready, go, downloadHref } = useConverter();
 
   return (
     <div className="row">
@@ -20,6 +20,9 @@ const Converter = () => {
       </div>
       <div className="col-12">
         <Button disabled={!ready} onClick={go}>Calc motor control</Button>
+      </div>
+      <div className="col-12 my-3">
+        {downloadHref !== '' && <a href={downloadHref} download="pulses.json">download</a>}
       </div>
     </div>
   );

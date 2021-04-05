@@ -73,6 +73,10 @@ export const realCoorsState = selector({
         return null;
       }
 
+      if (isNaN(coors.x) || isNaN(coors.y)) {
+        return null;
+      }
+
       const leftY2 = coors.y - specs['tool-offset-y'];
       const rightY2 = leftY2;
       const leftX2 = coors.x - specs['tool-offset-x'];

@@ -1,13 +1,13 @@
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useState, useEffect } from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { fileContentState } from '../ImageHandler/state';
 import { specsState } from '../SpecInputs/state';
-import { progressState, outputState, specErrorsState, specsReadyState, coorErrorsState, realCoorsState } from './state';
+import { progressState, specErrorsState, specsReadyState, coorErrorsState, realCoorsState, downloadBlobState } from './state';
 
 import solveCoors from './helpers/solveCoors';
 
 export default function useConverter() {
-  const setOutput = useSetRecoilState(outputState);
   const setProgress = useSetRecoilState(progressState);
   const specsAlpha = useRecoilValue(specsState);
   const fileContent = useRecoilValue(fileContentState);
@@ -15,6 +15,8 @@ export default function useConverter() {
   const specErrors = useRecoilValue(specErrorsState);
   const coorErrors = useRecoilValue(coorErrorsState);
   const realCoors = useRecoilValue(realCoorsState);
+  const [downloadBlob, setDownloadBlob] = useRecoilState(downloadBlobState);
+  const [downloadHref, setDownloadHref] = useState('');
   
   const mmToCm = (mm) => mm / 10;
   const mmToM = (mm) => mm / 1000;
@@ -192,15 +194,24 @@ export default function useConverter() {
         await updateProgress(`path ${i} converted to pulses (${t2-t1} ms)`);
       }
 
-      // somehow make it available for download?
-      setOutput(bigPulseList);
+      setDownloadBlob(new Blob([JSON.stringify({
+          stepsPerSecond: cmToMm(specs['feed-rate']) * stepsPerMm,
+          steps: bigPulseList
+        })], {type: 'text/plain'}));
     }
   }
+
+  useEffect(() => {
+    if (downloadBlob) {
+      setDownloadHref(URL.createObjectURL(downloadBlob));
+    }
+  }, [downloadBlob]);
   
   return {
     specErrors,
     coorErrors,
     ready: specsReady,
-    go
+    go,
+    downloadHref
   };
 }
