@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { fileContentState } from '../ImageHandler/state';
 import { specsState } from '../SpecInputs/state';
-import { progressState, outputState, specErrorsState, coorsReadyState, coorErrorsState, realCoorsState } from './state';
+import { progressState, outputState, specErrorsState, specsReadyState, coorErrorsState, realCoorsState } from './state';
+
+import solveCoors from './helpers/solveCoors';
 
 export default function useConverter() {
   const setOutput = useSetRecoilState(outputState);
   const setProgress = useSetRecoilState(progressState);
   const specsAlpha = useRecoilValue(specsState);
   const fileContent = useRecoilValue(fileContentState);
-  const coorsReady = useRecoilValue(coorsReadyState);
+  const specsReady = useRecoilValue(specsReadyState);
   const specErrors = useRecoilValue(specErrorsState);
   const coorErrors = useRecoilValue(coorErrorsState);
   const realCoors = useRecoilValue(realCoorsState);
@@ -23,7 +24,7 @@ export default function useConverter() {
   const mToCm = (m) => m * 100;
 
   const go = async () => {
-    if (coorsReady) {
+    if (specsReady) {
       const specs = Object.keys(specsAlpha).reduce((out, k) => ({
         ...out,
         [k]: Number(specsAlpha[k])
@@ -31,26 +32,28 @@ export default function useConverter() {
 
       setProgress([]);
       const progress = [];
-      const updateProgress = (msg) => {
+      const updateProgress = async (msg) => {
         progress.push(msg);
         setProgress([ ...progress ]);
+        // give progress a chance to propogate
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
 
+      // ---- Get SVG, it's dimensions and paths ----
       const parser = new DOMParser();
       const dom = parser.parseFromString(fileContent, "application/xml");
 
       const mySvg = dom.querySelector("svg");
       const [_minX, _minY, _width, height] = mySvg.getAttribute("viewBox").split(" ");
 
-      // circle, ellipse, line, mesh, path, polygon, polyline, rect
+      // in future, also get: circle, ellipse, line, mesh, path, polygon, polyline, rect?
       const myPaths = Array.from(dom.querySelectorAll("path"));
-      updateProgress(`Found ${myPaths.length} paths, of lengths:`);
+      await updateProgress(`Found ${myPaths.length} paths, of lengths:`);
       for (let i = 0; i < myPaths.length; i++) {
-        updateProgress(`${i}: ${Math.round(myPaths[i].getTotalLength() * 100) / 100}`);
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 0));
+        await updateProgress(`${i}: ${Math.round(myPaths[i].getTotalLength() * 100) / 100}`);
+      }     
       
+      // ---- Define functions for converting SVG coors into real-world coors ----
       const unitToMm = (unit) => unit * cmToMm(specs["final-height"]) / height;
       const mmToUnit = (mm) => mm * height / cmToMm(specs["final-height"]);
 
@@ -75,50 +78,129 @@ export default function useConverter() {
         return out;
       }
 
+      // ---- Define functions to convert straight lines to motor moves ----
+      const getPulses = ({ actualLeftSteps, leftDirection, actualRightSteps, rightDirection }) => {
+        const mostSteps = Math.max(actualLeftSteps, actualRightSteps);
+
+        const leftModulus = actualLeftSteps === 0 ? 0 : mostSteps / actualLeftSteps;
+        const rightModulus = actualRightSteps === 0 ? 0 : mostSteps / actualRightSteps;
+
+        const out = new Array(mostSteps).fill(null).map(() => ({ l: 0, r: 0 }));
+
+        if (leftModulus > 0 && rightModulus > 0) {
+          let leftSum = 0;
+          let rightSum = 0;
+          for (let i = 0; i < mostSteps; i++) {
+            if (i >= leftSum) {
+              out[i].l = leftDirection;
+              leftSum += leftModulus;
+            }
+            if (i >= rightSum) {
+              out[i].r = rightDirection;
+              rightSum += rightModulus;
+            }
+          }
+        } else if (rightModulus <= 0) {
+          let leftSum = 0;
+          for (let i = 0; i < mostSteps; i++) {
+            if (i >= leftSum) {
+              out[i].l = leftDirection;
+              leftSum += leftModulus;
+            }
+          }
+        } else if (leftModulus <= 0) {
+          let rightSum = 0;
+          for (let i = 0; i < mostSteps; i++) {
+            if (i >= rightSum) {
+              out[i].r = rightDirection;
+              rightSum += rightModulus;
+            }
+          }
+        }
+
+        return out;
+      }
+
+      // euclidean distance
+      const eD = (a, b) => Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+
+      const mmPerStep = cmToMm(2 * Math.PI * specs['spool-radius'] * specs['step-resolution'] / 360);
+      const stepsPerMm = 1 / mmPerStep;
+
+      const traverseStraight = (current, desired) => {
+        const leftDelta = eD({ x: 0, y: 0 }, desired) - eD({ x: 0, y: 0 }, current);
+        const rightDelta = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, desired) - eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, current);
+
+        const actualLeftSteps = Math.round(Math.abs(leftDelta) * stepsPerMm);
+        const actualRightSteps = Math.round(Math.abs(rightDelta) * stepsPerMm);
+
+        // 1 = clockwise
+        // 0 = no op
+        // -1 = counter-clockwise
+        const leftDirection = actualLeftSteps === 0 ? 0 : leftDelta / Math.abs(leftDelta);
+        const rightDirection = actualRightSteps === 0 ? 0 : -1 * rightDelta / Math.abs(rightDelta);
+
+        const newLeftLength = eD({ x: 0, y: 0 }, current) + (actualLeftSteps * mmPerStep * leftDirection);
+        const newRightLength = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, current) + (actualRightSteps * mmPerStep * rightDirection * -1);
+
+        return { 
+          pulses: getPulses({ actualLeftSteps, leftDirection, actualRightSteps, rightDirection }),
+          newCurrent: solveCoors({ 
+            eyeToEye: cmToMm(specs['eye-to-eye']),
+            toolOffsetX: cmToMm(specs['tool-offset-x']),
+            toolOffsetY: cmToMm(specs['tool-offset-y']),
+            leftLength: newLeftLength,
+            rightLength: newRightLength
+          })
+        };
+      }
+
+      // ---- Gather all real-world coors we want to hit ----
       const masterCoors = {};
+      masterCoors['start'] = { x: cmToMm(realCoors.outputRect.x), y: cmToMm(realCoors.outputRect.y) };
 
-      masterCoors['start'] = { x: realCoors.outputRect.x, y: realCoors.outputRect.y };
-
-      let t1 = Date.now();
+      let t1;
       for (let i = 0; i < myPaths.length; i++) {
+        t1 = Date.now();
+
         const key = `path-${i}`;
         masterCoors[key] = pathToCoors(myPaths[i]);
         
         let t2 = Date.now();
-        updateProgress(`path ${i} converted (${t2-t1} ms)`);
+        await updateProgress(`path ${i} converted to coors (${t2-t1} ms)`);
+      }
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
+      // ---- Traverse all paths sequentially ----
+      let bigPulseList = [];
+
+      let current = masterCoors.start;
+      for (let i = 0; i < myPaths.length; i++) {
         t1 = Date.now();
+      
+        for (let coor of masterCoors[`path-${i}`]) {
+          const { newCurrent, pulses } = traverseStraight(current, coor);
+
+          if (!newCurrent) {
+            return null;
+          }
+
+          current = newCurrent;
+          bigPulseList = [ ...bigPulseList, ...pulses ];
+        }
+
+        let t2 = Date.now();
+        await updateProgress(`path ${i} converted to pulses (${t2-t1} ms)`);
       }
-
-      // euclidean distance
-      const eD = (a, b) => Math.pow(b.y - a.y, 2) + Math.pow(b.x - a.x, 2);
-
-      const slope = (a, b) => (b.y - a.y) / (b.x - a.x);
-
-      const traverse = (current, desired) => {
-
-        // calculate how many steps it takes to lengthen the string by a mm (this can be done outside)
-        // solve for lengths at desired
-        // round find delta lengths in mm, convert to steps, round to nearest
-        // move there, return new position
-
-      }
-
-      // at each interval, set left and right move:
-      // 1: step clockwise
-      // 0: do nothing
-      // -1: step counter-clockwise
 
       // somehow make it available for download?
-      setOutput({});
+      setOutput(bigPulseList);
     }
   }
   
   return {
     specErrors,
     coorErrors,
-    ready: coorsReady,
+    ready: specsReady,
     go
   };
 }

@@ -1,7 +1,7 @@
 import { selector } from 'recoil';
 
-import { fileContentState } from '../../ImageHandler/state';
 import { specsState } from '../../SpecInputs/state';
+import { realCoorsState } from './realCoors';
 
 export const BOUNDS = {
   'step-resolution': {
@@ -12,42 +12,6 @@ export const BOUNDS = {
     upper: 10,
     lower: 0.01
   },
-  'final-height': {
-    upper: 1000,
-    lower: 1
-  },
-  'eye-to-eye': {
-    upper: 1000,
-    lower: 1
-  },
-  'spool-diameter': {
-    upper: 50,
-    lower: 0
-  },
-  'initial-length-left': {
-    upper: 1000,
-    lower: 0
-  },
-  'initial-length-right': {
-    upper: 1000,
-    lower: 0
-  },
-  'initial-coors-x': {
-    upper: 1000,
-    lower: 0
-  },
-  'initial-coors-y': {
-    upper: 1000,
-    lower: 0
-  },
-  'tool-offset-x': {
-    upper: 50,
-    lower: 0
-  },
-  'tool-offset-y': {
-    upper: 50,
-    lower: 0
-  },
   'output-resolution': {
     upper: 10,
     lower: 0.1
@@ -57,12 +21,13 @@ export const BOUNDS = {
 export const specErrorsState = selector({
   key: 'specErrors',
   get: ({get}) => {
-    const fileContent = get(fileContentState);
+    const realCoors = get(realCoorsState);
     const specsAlpha = get(specsState);
 
-    // do we have a file and specs?
-    if (!fileContent || !specsAlpha) {
-      return { msg: 'No image' };
+    if (!realCoors) {
+      return { msg: 'Specs are not physically valid' };
+    } else if (realCoors.outputRect.x + realCoors.outputRect.width > realCoors.rightEye.x) {
+      return { msg: 'Can\'t draw outside vertical bounds of eyes' };
     }
 
     const specs = Object.keys(specsAlpha).reduce((out, k) => ({
@@ -83,17 +48,6 @@ export const specErrorsState = selector({
         return { spec: k, msg: `${k} is too high; max is ${BOUNDS[k].upper}` };
       } else if (specs[k] < BOUNDS[k].lower) {
         return { spec: k, msg: `${k} is too low; minimum is ${BOUNDS[k].lower}` };
-      }
-    }
-
-    // is the initial position physically valid?
-    if (specs['specify-start-by-coors']) {
-      if (
-        specs['initial-coors-x'] +
-        (specs['tool-offset-x'] * 2) >
-        specs['eye-to-eye']
-      ) {
-        return { msg: 'Specs are not physically valid' };
       }
     }
 

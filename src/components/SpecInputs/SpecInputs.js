@@ -16,7 +16,7 @@ const SpecInputs = () => {
       <InputRow label="Feed Rate (cm/s)" actionType="feed-rate" specs={specs} dispatch={dispatch} />
       <InputRow label="Output Height" actionType='final-height' specs={specs} dispatch={dispatch} />
       <InputRow label="Output Resolution" actionType="output-resolution" specs={specs} dispatch={dispatch} />
-      <InputRow label="Spool Diameter" actionType='spool-diameter' specs={specs} dispatch={dispatch} />
+      <InputRow label="Spool Radius" actionType='spool-radius' specs={specs} dispatch={dispatch} />
       <InputRow label="Eye-To-Eye" actionType='eye-to-eye' specs={specs} dispatch={dispatch} />
       <p>It's assumed that the plotter uses two strings, each with one end wound around a spool, travelling through an eye, and the other attached to a symmetrical tool holder. The program will start drawing from the upper-left corner of the image.</p>
       <FormGroup tag="fieldset">

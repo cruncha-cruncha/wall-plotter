@@ -10,10 +10,10 @@ const Converter = () => {
     <div className="row">
       <div className="col-12">
         <div className="my-2">
-          {specErrors 
-            ? <span className="text-danger">{specErrors.msg}</span>
-            : coorErrors 
-              ? <span className="text-danger">{coorErrors.msg}</span>
+          {coorErrors 
+            ? <span className="text-danger">{coorErrors.msg}</span>
+            : specErrors 
+              ? <span className="text-danger">{specErrors.msg}</span>
               : null
           }
         </div>

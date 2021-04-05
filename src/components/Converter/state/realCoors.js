@@ -2,12 +2,14 @@ import { selector } from 'recoil';
 
 import { fileContentState } from '../../ImageHandler/state';
 import { specsState } from '../../SpecInputs/state';
-import { specsReadyState } from './specsReady';
+import { coorsReadyState } from './coorsReady';
+
+import solveCoors from '../helpers/solveCoors';
 
 export const realCoorsState = selector({
   key: 'realCoors',
   get: ({get}) => {
-    const ready = get(specsReadyState);
+    const ready = get(coorsReadyState);
     const specsAlpha = get(specsState);
     const fileContent = get(fileContentState);
 
@@ -33,7 +35,7 @@ export const realCoorsState = selector({
 
     if (specs['specify-start-by-coors']) {
       return {
-        spoolDiameter: specs['spool-diameter'],
+        spoolRadius: specs['spool-radius'],
         leftEye: { x: 0, y: 0 },
         rightEye: { x: specs['eye-to-eye'], y: 0 },
         leftLine: {
@@ -59,31 +61,25 @@ export const realCoorsState = selector({
         totalHeight: specs['initial-coors-y'] + mmToCm(unitToMm(height))
       }
     } else {
-      // eye-to-eye = sqrt(initial-length-left^2 - y^2) + (tool-offset-x * 2) + sqrt(initial-length-right^2 - y^2)
-      // solve for y
+      const coors = solveCoors({
+        eyeToEye: specs['eye-to-eye'],
+        toolOffsetX: specs['tool-offset-x'],
+        toolOffsetY: specs['tool-offset-y'],
+        leftLength: specs['initial-length-left'],
+        rightLength: specs['initial-length-right'],
+      });
 
-      const n1 = specs['eye-to-eye'] - (specs['tool-offset-x'] * 2);
-      const n2 = Math.pow(specs['initial-length-right'], 2) - Math.pow(specs['initial-length-left'], 2) - Math.pow(n1, 2);
+      if (!coors) {
+        return null;
+      }
 
-      const a = 4 * Math.pow(n1, 2);
-      // b is always zero
-      const c = -4 * Math.pow(n1, 2) * Math.pow(specs['initial-length-left'], 2) + Math.pow(n2, 2);
-
-      const leftY2 = Math.sqrt(-4 * a * c) / (2 * a);
+      const leftY2 = coors.y - specs['tool-offset-y'];
       const rightY2 = leftY2;
-      const leftX2 = Math.sqrt(Math.pow(specs['initial-length-left'], 2) - Math.pow(leftY2, 2));
-      const rightX2 = specs['eye-to-eye'] - Math.sqrt(Math.pow(specs['initial-length-right'], 2) - Math.pow(rightY2, 2));
-
-      if (isNaN(leftY2) || isNaN(rightY2) || isNaN(leftX2) || isNaN(rightX2)) {
-        return null;
-      }
-
-      if (Math.round(rightX2 * 100) / 100 !== Math.round((leftX2 + (specs['tool-offset-x'] * 2)) * 100) / 100) {
-        return null;
-      }
+      const leftX2 = coors.x - specs['tool-offset-x'];
+      const rightX2 = coors.x + specs['tool-offset-x'];
 
       return {
-        spoolDiameter: specs['spool-diameter'],
+        spoolRadius: specs['spool-radius'],
         leftEye: { x: 0, y: 0 },
         rightEye: { x: specs['eye-to-eye'], y: 0 },
         leftLine: {

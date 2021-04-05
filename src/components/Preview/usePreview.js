@@ -38,12 +38,12 @@ export default function usePreview() {
           <circle
             cx={coors.leftEye.x}
             cy={coors.leftEye.y}
-            r={coors.spoolDiameter / 2}
+            r={coors.spoolRadius}
             fill="black" />
           <circle
             cx={coors.rightEye.x}
             cy={coors.rightEye.y}
-            r={coors.spoolDiameter / 2}
+            r={coors.spoolRadius}
             fill="black" />
         </svg>
       )
