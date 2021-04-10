@@ -194,10 +194,7 @@ export default function useConverter() {
         await updateProgress(`path ${i} converted to pulses (${t2-t1} ms)`);
       }
 
-      setDownloadBlob(new Blob([JSON.stringify({
-          stepsPerSecond: cmToMm(specs['feed-rate']) * stepsPerMm,
-          steps: bigPulseList
-        })], {type: 'text/plain'}));
+      setDownloadBlob(new Blob([JSON.stringify(bigPulseList)], {type: 'text/plain'}));
     }
   }
 

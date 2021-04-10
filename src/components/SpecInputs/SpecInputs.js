@@ -13,7 +13,6 @@ const SpecInputs = () => {
       <h2>Specifications</h2>
       <p>All values in cms unless otherwise specified.</p>
       <InputRow label="Step Resolution (degrees)" actionType='step-resolution' specs={specs} dispatch={dispatch} />
-      <InputRow label="Feed Rate (cm/s)" actionType="feed-rate" specs={specs} dispatch={dispatch} />
       <InputRow label="Output Height" actionType='final-height' specs={specs} dispatch={dispatch} />
       <InputRow label="Output Resolution" actionType="output-resolution" specs={specs} dispatch={dispatch} />
       <InputRow label="Spool Radius" actionType='spool-radius' specs={specs} dispatch={dispatch} />

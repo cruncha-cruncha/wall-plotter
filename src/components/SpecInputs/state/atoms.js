@@ -4,7 +4,6 @@ export const specsState = atom({
   key: "specs",
   default: {
     'step-resolution': '1.8',
-    'feed-rate': '1',
     'final-height': '60',
     'spool-radius': '2',
     'eye-to-eye': '150',
