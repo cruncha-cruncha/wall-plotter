@@ -64,6 +64,15 @@ export default function useConverter() {
         y: cmToMm(realCoors.outputRect.y) + unitToMm(point.y)
       });
 
+      // prune / decimate as points are adding
+      // create line from n to n+x-1, calculate distance from line to point n+x
+      // if distance < output-resolution / 2, get rid of the point
+      // if getting rid of the point, next threshold has to be output-resolution / 4
+      // repeat
+
+      // BUT FIRST
+      // build python and arduino code
+      // test on very simple svgs (lines and arcs)
       const pathToCoors = (path) => {
         const out = [];
         const total = unitToMm(path.getTotalLength());

@@ -22,7 +22,7 @@ const Converter = () => {
         <Button disabled={!ready} onClick={go}>Calc motor control</Button>
       </div>
       <div className="col-12 my-3">
-        {downloadHref !== '' && <a href={downloadHref} download="pulses.json">download</a>}
+        {downloadHref !== '' && <a href={downloadHref} download="motorControl.json">download</a>}
       </div>
     </div>
   );
