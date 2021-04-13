@@ -13,46 +13,46 @@ BAUDRATE = 9600
 # R = right
 # steps
 # H = hold
-# CC = counter-clockwise
-# C = clockwise
+# L = longer
+# S = short
 COMMANDS = {
     "enable":  b'\xff',
     "disable": b'\x88',
     "LH,RH":   b'\x00',
-    "LH,RCC":  b'\x01',
-    "LH,RC":   b'\x02',
-    "LCC,RH":  b'\x10',
-    "LCC,RCC": b'\x11',
-    "LCC,RC":  b'\x12',
-    "LC,RH":   b'\x20',
-    "LC,RCC":  b'\x21',
-    "LC,RC":   b'\x22',
+    "LH,RL":   b'\x01',
+    "LH,RS":   b'\x02',
+    "LL,RH":   b'\x10',
+    "LL,RL":   b'\x11',
+    "LL,RS":   b'\x12',
+    "LS,RH":   b'\x20',
+    "LS,RL":   b'\x21',
+    "LS,RS":   b'\x22',
 }
 
-# 1  = clockwise
+# 1  = longer
 # 0  = hold
-# -1 = counter-clockwise
+# -1 = shorter
 def stepToHex(step):
     if (not 'l' in step) or (not 'r' in step):
         return COMMANDS["LH,RH"]
     if step['l'] == 0 and step['r'] == 0:
         return COMMANDS["LH,RH"]
     elif step['l'] == 0 and step['r'] == 1:
-        return COMMANDS["LH,RC"]
+        return COMMANDS["LH,RL"]
     elif step['l'] == 0 and step['r'] == -1:
-        return COMMANDS["LH,RCC"]
+        return COMMANDS["LH,RS"]
     elif step['l'] == 1 and step['r'] == 0:
-        return COMMANDS["LC,RH"]
+        return COMMANDS["LL,RH"]
     elif step['l'] == 1 and step['r'] == 1:
-        return COMMANDS["LC,RC"]
+        return COMMANDS["LL,RL"]
     elif step['l'] == 1 and step['r'] == -1:
-        return COMMANDS["LC,RCC"]
+        return COMMANDS["LL,RS"]
     elif step['l'] == -1 and step['r'] == 0:
-        return COMMANDS["LCC,RH"]
+        return COMMANDS["LS,RH"]
     elif step['l'] == -1 and step['r'] == 1:
-        return COMMANDS["LCC,RC"]
+        return COMMANDS["LS,RL"]
     elif step['l'] == -1 and step['r'] == -1:
-        return COMMANDS["LCC,RCC"]
+        return COMMANDS["LS,RS"]
     return COMMANDS["LH,RH"]
 
 class Plotter:
@@ -204,22 +204,22 @@ class Manual:
 
         print()
         print(" Manual mode")
-        print(" k = right motor clockwise")
-        print(" j = right motor counter-clockwise")
-        print(" f = left motor clockwise")
-        print(" d = left motor counter-clockwise")
+        print(" k = right longer")
+        print(" j = right shorter")
+        print(" f = left longer")
+        print(" d = left shorter")
         print(" q = back to standby")
         print()
 
         while True:
             if keyboard.is_pressed("k"):
-                controller.send(COMMANDS["LH,RC"])
+                controller.send(COMMANDS["LH,RL"])
             elif keyboard.is_pressed("j"):
-                controller.send(COMMANDS["LH,RCC"])
+                controller.send(COMMANDS["LH,RS"])
             elif keyboard.is_pressed("f"):
-                controller.send(COMMANDS["LC,RH"])
+                controller.send(COMMANDS["LL,RH"])
             elif keyboard.is_pressed("d"):
-                controller.send(COMMANDS["LCC,RH"])
+                controller.send(COMMANDS["LS,RH"])
             elif keyboard.is_pressed("q"):
                 input()
                 controller.setState(STATE["STANDBY"])  

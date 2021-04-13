@@ -145,14 +145,14 @@ export default function useConverter() {
         const actualLeftSteps = Math.round(Math.abs(leftDelta) * stepsPerMm);
         const actualRightSteps = Math.round(Math.abs(rightDelta) * stepsPerMm);
 
-        // 1 = clockwise
-        // 0 = no op
-        // -1 = counter-clockwise
+        // 1  = longer
+        // 0  = no op
+        // -1 = shorter
         const leftDirection = actualLeftSteps === 0 ? 0 : leftDelta / Math.abs(leftDelta);
-        const rightDirection = actualRightSteps === 0 ? 0 : -1 * rightDelta / Math.abs(rightDelta);
+        const rightDirection = actualRightSteps === 0 ? 0 : rightDelta / Math.abs(rightDelta);
 
         const newLeftLength = eD({ x: 0, y: 0 }, current) + (actualLeftSteps * mmPerStep * leftDirection);
-        const newRightLength = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, current) + (actualRightSteps * mmPerStep * rightDirection * -1);
+        const newRightLength = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, current) + (actualRightSteps * mmPerStep * rightDirection);
 
         return { 
           pulses: getPulses({ actualLeftSteps, leftDirection, actualRightSteps, rightDirection }),
