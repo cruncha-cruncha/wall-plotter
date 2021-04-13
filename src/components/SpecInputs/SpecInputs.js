@@ -41,13 +41,13 @@ const SpecInputs = () => {
       {specs['specify-start-by-coors'] 
         ? (
           <Fragment>
-            <p>Measure from the center of the left spool to the top left corner of the desired image location.</p>
+            <p>Measure from the center of the left eye to the top left corner of the desired image location.</p>
             <InputRow label="Horizontal Offset" actionType='initial-coors-x' specs={specs} dispatch={dispatch} />
             <InputRow label="Vertical Offset" actionType='initial-coors-y' specs={specs} dispatch={dispatch} />
           </Fragment>)
         : (
           <Fragment>
-            <p>Measure from the center of either the left or right spool to the corresponding tool holder terminus (where the string connects).</p>
+            <p>Measure from either the left or right eye to the corresponding tool holder terminus (where the string connects).</p>
             <InputRow label="Left, initial distance" actionType='initial-length-left' specs={specs} dispatch={dispatch} />
             <InputRow label="Right, initial distance" actionType='initial-length-right' specs={specs} dispatch={dispatch} />
           </Fragment>)}
