@@ -64,27 +64,56 @@ export default function useConverter() {
         y: cmToMm(realCoors.outputRect.y) + unitToMm(point.y)
       });
 
-      // prune / decimate as points are adding
-      // create line from n to n+x-1, calculate distance from line to point n+x
-      // if distance < output-resolution / 2, get rid of the point
-      // if getting rid of the point, next threshold has to be output-resolution / 4
-      // repeat
+      // how far away is coorB from a line passing through coorA and coorC
+      const distToLine = (coorA, coorB, coorC) => {
+        return (
+          Math.abs((coorC.x - coorA.x) * (coorA.y - coorB.y) - (coorA.x - coorB.x) * (coorC.y - coorA.y)) /
+          Math.sqrt(Math.pow((coorC.x - coorA.x), 2) + Math.pow((coorC.y - coorA.y), 2))
+        );
+      }
 
-      // BUT FIRST
-      // build python and arduino code
-      // test on very simple svgs (lines and arcs)
       const pathToCoors = (path) => {
         const out = [];
         const total = unitToMm(path.getTotalLength());
 
-        let i = 0;
-        while (i < total) {
+        // use 2mm output resolution
+        const resolution = 2;
+
+        out.push(
+          pointToCoor(
+            path.getPointAtLength(0)));
+
+        if (total > resolution) {
+
           out.push(
             pointToCoor(
               path.getPointAtLength(
-                mmToUnit(i))));
-          i += cmToMm(specs['output-resolution']);
-        }
+                mmToUnit(resolution))));
+
+          if (total > resolution * 2) {
+            let lag = 0;
+            let mm = resolution * 2; 
+            let precision = resolution;
+
+            while (mm < total) {
+              const newCoor = pointToCoor(path.getPointAtLength(mmToUnit(mm)))
+              const dist = distToLine(out[lag], out[lag+1], newCoor);
+
+              if (dist < precision) {
+                out[lag+1] = newCoor;
+                precision = precision / 2;
+              } else {
+                lag += 1;
+                out.push(newCoor);
+                precision = resolution;
+              }
+              
+              mm += resolution;
+            }
+          }
+        } 
+
+        out.push(pointToCoor(path.getPointAtLength(path.getTotalLength())));
 
         return out;
       }

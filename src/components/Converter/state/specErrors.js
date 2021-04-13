@@ -8,10 +8,6 @@ export const BOUNDS = {
     upper: 45,
     lower: 0.01
   },
-  'output-resolution': {
-    upper: 10,
-    lower: 0.1
-  },
 }
 
 export const specErrorsState = selector({
