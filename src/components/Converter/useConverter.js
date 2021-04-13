@@ -168,8 +168,13 @@ export default function useConverter() {
       const stepsPerMm = 1 / mmPerStep;
 
       const traverseStraight = (current, desired) => {
-        const leftDelta = eD({ x: 0, y: 0 }, desired) - eD({ x: 0, y: 0 }, current);
-        const rightDelta = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, desired) - eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, current);
+        const currentLeftCoor = { x: current.x - cmToMm(specs['tool-offset-x']), y: current.y - cmToMm(specs['tool-offset-y'])};
+        const desiredLeftCoor = { x: desired.x - cmToMm(specs['tool-offset-x']), y: desired.y - cmToMm(specs['tool-offset-y'])};
+        const currentRightCoor = { x: current.x + cmToMm(specs['tool-offset-x']), y: current.y - cmToMm(specs['tool-offset-y'])};
+        const desiredRightCoor = { x: desired.x + cmToMm(specs['tool-offset-x']), y: desired.y - cmToMm(specs['tool-offset-y'])};
+
+        const leftDelta = eD({ x: 0, y: 0 }, desiredLeftCoor) - eD({ x: 0, y: 0 }, currentLeftCoor);
+        const rightDelta = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, desiredRightCoor) - eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, currentRightCoor);
 
         const actualLeftSteps = Math.round(Math.abs(leftDelta) * stepsPerMm);
         const actualRightSteps = Math.round(Math.abs(rightDelta) * stepsPerMm);
@@ -180,8 +185,8 @@ export default function useConverter() {
         const leftDirection = actualLeftSteps === 0 ? 0 : leftDelta / Math.abs(leftDelta);
         const rightDirection = actualRightSteps === 0 ? 0 : rightDelta / Math.abs(rightDelta);
 
-        const newLeftLength = eD({ x: 0, y: 0 }, current) + (actualLeftSteps * mmPerStep * leftDirection);
-        const newRightLength = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, current) + (actualRightSteps * mmPerStep * rightDirection);
+        const newLeftLength = eD({ x: 0, y: 0 }, currentLeftCoor) + (actualLeftSteps * mmPerStep * leftDirection);
+        const newRightLength = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, currentRightCoor) + (actualRightSteps * mmPerStep * rightDirection);
 
         return { 
           pulses: getPulses({ actualLeftSteps, leftDirection, actualRightSteps, rightDirection }),
