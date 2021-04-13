@@ -29,6 +29,11 @@ export const realCoorsState = selector({
     const dom = parser.parseFromString(fileContent, "application/xml");
 
     const mySvg = Array.from(dom.querySelectorAll("svg"))[0];
+    if (!mySvg.getAttribute("viewBox")) {
+      alert("SVG needs a viewBox");
+      return;
+    }
+
     const [_minX, _minY, width, height] = mySvg.getAttribute("viewBox").split(" ");
 
     const unitToMm = (unit) => unit * cmToMm(specs["final-height"]) / height;
