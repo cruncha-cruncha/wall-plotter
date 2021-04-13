@@ -1,4 +1,5 @@
 #define enablePin 8
+#define pauseMS 1000
 
 // X (left)
 #define xDirPin 5
@@ -69,12 +70,12 @@ void loop() {
       digitalWrite(yStepPin, LOW);
     }
 
-    delayMicroseconds(1000);
+    delayMicroseconds(pauseMS);
     
     digitalWrite(xStepPin, LOW);
     digitalWrite(yStepPin, LOW);
     
-    delayMicroseconds(1000);
+    delayMicroseconds(pauseMS);
 
     Serial.write(buf, 1);
     
