@@ -11,7 +11,7 @@ const Preview = () => {
         <span>Preview</span>
       </div>
       <div className="d-flex">
-        <div style={{ border: "1px solid black", height: "402px", width: "402px", overflow: "scroll" }}>
+        <div style={{ border: "1px solid black", height: "402px", overflowY: "scroll" }}>
           {svg}
         </div>
       </div>

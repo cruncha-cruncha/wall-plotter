@@ -23,7 +23,7 @@ function ImageHandler() {
         <Input type="file" id="select-svg-input" accept=".svg" onChange={handleChange} />
       </div>
       <div className="d-flex">
-        <div style={{ border: '1px solid black', height: "402px", width: "402px", overflow: "scroll" }} >
+        <div style={{ border: '1px solid black', height: "402px", overflowY: "scroll" }} >
           {file && <img src={file} width="400" alt="selected img" />}
         </div>
       </div>
