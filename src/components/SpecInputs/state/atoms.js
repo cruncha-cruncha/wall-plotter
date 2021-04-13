@@ -13,7 +13,6 @@ export const specsState = atom({
     'initial-coors-x': '30',
     'initial-coors-y': '30',
     'tool-offset-x': '2',
-    'tool-offset-y': '1.5',
-    'output-resolution': '0.5'
+    'tool-offset-y': '1.5'
   }
 });
