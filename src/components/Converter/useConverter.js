@@ -248,7 +248,7 @@ export default function useConverter() {
         pulses: bigPulseList
       };
 
-      setDownloadBlob(new Blob(JSON.stringify(out), {type: 'text/plain'}));
+      setDownloadBlob(new Blob([JSON.stringify(out)], {type: 'text/plain'}));
     }
   }
 
