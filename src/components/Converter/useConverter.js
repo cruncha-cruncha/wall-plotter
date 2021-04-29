@@ -237,7 +237,18 @@ export default function useConverter() {
         await updateProgress(`path ${i} converted to pulses (${t2-t1} ms)`);
       }
 
-      setDownloadBlob(new Blob([JSON.stringify(bigPulseList)], {type: 'text/plain'}));
+      // get steps per second
+      const stepsPerSecond = () => {
+        const oneStep = specs['step-resolution'] / 360 * specs['spool-radius'] * 2 * Math.PI;
+        return 2.0 / oneStep; // ~ 2cm/s
+      }
+
+      const out = {
+        stepsPerSecond: stepsPerSecond(),
+        pulses: bigPulseList
+      };
+
+      setDownloadBlob(new Blob(JSON.stringify(out), {type: 'text/plain'}));
     }
   }
 
