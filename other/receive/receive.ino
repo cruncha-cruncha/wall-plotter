@@ -1,5 +1,4 @@
 #define enablePin 8
-#define pauseMS 1000
 
 // X (left)
 #define xDirPin 5
@@ -9,6 +8,7 @@
 #define yDirPin 6
 #define yStepPin 3
 
+unsigned int pauseMS = 1000
 byte buf[1];
 
 void setup() {

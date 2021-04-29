@@ -167,21 +167,24 @@ class Run:
         with open(controller.input_file_path, 'r') as f:
             data = json.load(f)
 
-            spare = len(data) % self.chunk_size
+            steps_per_second = data["stepsPerSecond"]
+            moves = data["pulses"]
+
+            spare = len(moves) % self.chunk_size
 
             if not (spare == 0):
-                self.sendAll(controller, data[0 : spare])
+                self.sendAll(controller, moves[0 : spare])
                 received = self.receiveSome(controller, spare)
                 if not (received == spare):
                     print("ERROR: sent {} steps, received {}".format( spare, received))
                     controller.setState(STATE["STANDBY"])
                     return 
 
-            if len(data) > spare:
-                self.sendAll(controller, data[spare : spare + self.chunk_size])
+            if len(moves) > spare:
+                self.sendAll(controller, moves[spare : spare + self.chunk_size])
 
-                for i in range(1, (len(data) - spare) // self.chunk_size):
-                    self.sendAll(controller, data[spare + (i * self.chunk_size) : spare + ((i+1) * self.chunk_size)])
+                for i in range(1, (len(moves) - spare) // self.chunk_size):
+                    self.sendAll(controller, moves[spare + (i * self.chunk_size) : spare + ((i+1) * self.chunk_size)])
                     received = self.receiveSome(controller, self.chunk_size)
                     if not (received == self.chunk_size):
                         print("ERROR: at chunk {}, sent {} steps, received {}".format(i, self.chunk_size, received))
