@@ -46,7 +46,7 @@ export default function useConverter() {
       const dom = parser.parseFromString(fileContent, "application/xml");
 
       const mySvg = dom.querySelector("svg");
-      const [_minX, _minY, _width, height] = mySvg.getAttribute("viewBox").split(" ");
+      const [_minX, _minY, _width, height] = mySvg.getAttribute("viewBox").split(",");
 
       // in future, also get: circle, ellipse, line, mesh, path, polygon, polyline, rect?
       const myPaths = Array.from(dom.querySelectorAll("path"));
