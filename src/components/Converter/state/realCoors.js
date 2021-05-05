@@ -34,7 +34,7 @@ export const realCoorsState = selector({
       return;
     }
 
-    const [_minX, _minY, width, height] = mySvg.getAttribute("viewBox").split(" ");
+    const [_minX, _minY, width, height] = mySvg.getAttribute("viewBox").split(",");
 
     const unitToMm = (unit) => unit * cmToMm(specs["final-height"]) / height;
 
