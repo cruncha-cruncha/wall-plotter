@@ -4,8 +4,7 @@ import time
 import json
 import os
 
-
-PORT = 'COM5'
+PORT = 'COM3'
 BAUDRATE = 9600
 
 # motors
@@ -85,7 +84,8 @@ class Plotter:
 
 class Standby:
     def go(self, controller):
-        controller.send(COMMANDS["disable"])
+        #controller.send(COMMANDS["disable"])
+        controller.send(COMMANDS["enable"])
 
         print()
         print(" Standby mode")
@@ -158,7 +158,7 @@ class Run:
             controller.setState(STATE["STANDBY"])
             return
 
-        controller.send(COMMANDS["enable"])
+        #controller.send(COMMANDS["enable"])
         print()
         print(" Run mode")
         print()
@@ -203,7 +203,7 @@ class Run:
 
 class Manual:
     def go(self, controller):
-        controller.send(COMMANDS["enable"])
+        #controller.send(COMMANDS["enable"])
 
         print()
         print(" Manual mode")

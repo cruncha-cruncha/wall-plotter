@@ -7,6 +7,8 @@ import { progressState, specErrorsState, specsReadyState, coorErrorsState, realC
 
 import solveCoors from './helpers/solveCoors';
 
+export const getViewBoxNums = viewBox => viewBox.split(viewBox.includes(',') ? "," : " ").map(val => Number(val.trim()));
+
 export default function useConverter() {
   const setProgress = useSetRecoilState(progressState);
   const specsAlpha = useRecoilValue(specsState);
@@ -46,7 +48,7 @@ export default function useConverter() {
       const dom = parser.parseFromString(fileContent, "application/xml");
 
       const mySvg = dom.querySelector("svg");
-      const [_minX, _minY, _width, height] = mySvg.getAttribute("viewBox").split(",");
+      const [_minX, _minY, _width, height] = getViewBoxNums(mySvg.getAttribute("viewBox"));
 
       // in future, also get: circle, ellipse, line, mesh, path, polygon, polyline, rect?
       const myPaths = Array.from(dom.querySelectorAll("path"));
