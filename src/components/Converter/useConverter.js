@@ -43,6 +43,8 @@ export default function useConverter() {
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
 
+      setDownloadHref('');
+
       // ---- Get SVG, it's dimensions and paths ----
       const parser = new DOMParser();
       const dom = parser.parseFromString(fileContent, "application/xml");
@@ -257,6 +259,8 @@ export default function useConverter() {
   useEffect(() => {
     if (downloadBlob) {
       setDownloadHref(URL.createObjectURL(downloadBlob));
+    } else {
+      setDownloadHref('');
     }
   }, [downloadBlob]);
   

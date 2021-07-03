@@ -84,7 +84,6 @@ class Plotter:
 
 class Standby:
     def go(self, controller):
-        #controller.send(COMMANDS["disable"])
         controller.send(COMMANDS["enable"])
 
         print()
@@ -98,6 +97,7 @@ class Standby:
         while True:
             key = input().strip()
             if key == "q":
+                controller.send(COMMANDS["disable"])
                 print("Goodbye")
                 quit()
             elif key == "m":
@@ -158,7 +158,6 @@ class Run:
             controller.setState(STATE["STANDBY"])
             return
 
-        #controller.send(COMMANDS["enable"])
         print()
         print(" Run mode")
         print()
@@ -203,7 +202,6 @@ class Run:
 
 class Manual:
     def go(self, controller):
-        #controller.send(COMMANDS["enable"])
 
         print()
         print(" Manual mode")
