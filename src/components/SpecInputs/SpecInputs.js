@@ -25,7 +25,7 @@ const SpecInputs = () => {
               type="radio"
               onChange={() => dispatch({ type: 'specify-start-by-coors', payload: false })}
               checked={!specs['specify-start-by-coors']}/>{' '}
-            Specify by distance from spools
+            Specify by distance from eyes
           </Label>
         </FormGroup>
         <FormGroup check>

@@ -6,6 +6,8 @@ import { coorsReadyState } from './coorsReady';
 
 import solveCoors from '../helpers/solveCoors';
 
+import { getViewBoxNums } from '../useConverter';
+
 export const realCoorsState = selector({
   key: 'realCoors',
   get: ({get}) => {
@@ -34,7 +36,7 @@ export const realCoorsState = selector({
       return;
     }
 
-    const [_minX, _minY, width, height] = mySvg.getAttribute("viewBox").split(" ");
+    const [_minX, _minY, width, height] = getViewBoxNums(mySvg.getAttribute("viewBox"));
 
     const unitToMm = (unit) => unit * cmToMm(specs["final-height"]) / height;
 

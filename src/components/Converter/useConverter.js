@@ -7,6 +7,8 @@ import { progressState, specErrorsState, specsReadyState, coorErrorsState, realC
 
 import solveCoors from './helpers/solveCoors';
 
+export const getViewBoxNums = viewBox => viewBox.split(viewBox.includes(',') ? "," : " ").map(val => Number(val.trim()));
+
 export default function useConverter() {
   const setProgress = useSetRecoilState(progressState);
   const specsAlpha = useRecoilValue(specsState);
@@ -41,12 +43,14 @@ export default function useConverter() {
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
 
+      setDownloadHref('');
+
       // ---- Get SVG, it's dimensions and paths ----
       const parser = new DOMParser();
       const dom = parser.parseFromString(fileContent, "application/xml");
 
       const mySvg = dom.querySelector("svg");
-      const [_minX, _minY, _width, height] = mySvg.getAttribute("viewBox").split(" ");
+      const [_minX, _minY, _width, height] = getViewBoxNums(mySvg.getAttribute("viewBox"));
 
       // in future, also get: circle, ellipse, line, mesh, path, polygon, polyline, rect?
       const myPaths = Array.from(dom.querySelectorAll("path"));
@@ -333,13 +337,26 @@ export default function useConverter() {
         await updateProgress(`path ${i} converted to pulses (${t2-t1} ms)`);
       }
 
-      setDownloadBlob(new Blob([JSON.stringify(bigPulseList)], {type: 'text/plain'}));
+      // get steps per second
+      const stepsPerSecond = () => {
+        const oneStep = specs['step-resolution'] / 360 * specs['spool-radius'] * 2 * Math.PI;
+        return 2.0 / oneStep; // ~ 2cm/s
+      }
+
+      const out = {
+        stepsPerSecond: stepsPerSecond(),
+        pulses: bigPulseList
+      };
+
+      setDownloadBlob(new Blob([JSON.stringify(out)], {type: 'text/plain'}));
     }
   }
 
   useEffect(() => {
     if (downloadBlob) {
       setDownloadHref(URL.createObjectURL(downloadBlob));
+    } else {
+      setDownloadHref('');
     }
   }, [downloadBlob]);
   
