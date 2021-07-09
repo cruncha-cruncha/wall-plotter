@@ -233,10 +233,10 @@ export default function useConverter() {
       const stepsPerMm = 1 / mmPerStep;
 
       const traverseStraight = (current, desired, nextSpeed) => {
-        const currentLeftCoor = { x: current.coors.x - cmToMm(specs['tool-offset-x']), y: current.coors.y - cmToMm(specs['tool-offset-y'])};
-        const desiredLeftCoor = { x: desired.coors.x - cmToMm(specs['tool-offset-x']), y: desired.coors.y - cmToMm(specs['tool-offset-y'])};
-        const currentRightCoor = { x: current.coors.x + cmToMm(specs['tool-offset-x']), y: current.coors.y - cmToMm(specs['tool-offset-y'])};
-        const desiredRightCoor = { x: desired.coors.x + cmToMm(specs['tool-offset-x']), y: desired.coors.y - cmToMm(specs['tool-offset-y'])};
+        const currentLeftCoor = { x: current.coor.x - cmToMm(specs['tool-offset-x']), y: current.coor.y - cmToMm(specs['tool-offset-y'])};
+        const desiredLeftCoor = { x: desired.coor.x - cmToMm(specs['tool-offset-x']), y: desired.coor.y - cmToMm(specs['tool-offset-y'])};
+        const currentRightCoor = { x: current.coor.x + cmToMm(specs['tool-offset-x']), y: current.coor.y - cmToMm(specs['tool-offset-y'])};
+        const desiredRightCoor = { x: desired.coor.x + cmToMm(specs['tool-offset-x']), y: desired.coor.y - cmToMm(specs['tool-offset-y'])};
 
         const leftDelta = eD({ x: 0, y: 0 }, desiredLeftCoor) - eD({ x: 0, y: 0 }, currentLeftCoor);
         const rightDelta = eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, desiredRightCoor) - eD({ x: cmToMm(specs['eye-to-eye']), y: 0 }, currentRightCoor);
@@ -268,7 +268,7 @@ export default function useConverter() {
           speed: (!!pulses && pulses.length > 0)
             ? pulses[pulses.length - 1].s
             : current.speed,
-          coors: solveCoors({ 
+          coor: solveCoors({ 
             eyeToEye: cmToMm(specs['eye-to-eye']),
             toolOffsetX: cmToMm(specs['tool-offset-x']),
             toolOffsetY: cmToMm(specs['tool-offset-y']),
@@ -325,7 +325,7 @@ export default function useConverter() {
           const coor = masterCoors[`path-${i}`][c];
           const { newCurrent, pulses } = traverseStraight(current, coor, nextSpeed);
 
-          if (!newCurrent.coors) {
+          if (!newCurrent.coor) {
             return null;
           }
 
