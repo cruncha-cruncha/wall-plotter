@@ -42,12 +42,12 @@ void leftHold() {
 }
 
 void rightShorter() {
-  digitalWrite(yDirPin, LOW);
+  digitalWrite(yDirPin, HIGH);
   digitalWrite(yStepPin, HIGH);
 }
 
 void rightLonger() {
-  digitalWrite(yDirPin, HIGH);
+  digitalWrite(yDirPin, LOW);
   digitalWrite(yStepPin, HIGH);
 }
 
@@ -100,7 +100,7 @@ void loop() {
     }
 
     byte speed = (buf[0] & 0x38) >> 3;
-    unsigned long pauseMS = 1000 + (speed * 285);
+    unsigned long pauseMS = 2995 - (speed * 285);
 
     delayMicroseconds(pauseMS);
     

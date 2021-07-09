@@ -41,9 +41,9 @@ def stepToHex(step):
     elif step['l'] == -1 and step['r'] == -1:
         motorDirections = b'\x07'
 
-    speed = step['l'] << 3
+    speed = step['s'] << 3
 
-    return bytes(motorDirections|speed)
+    return bytes([motorDirections[0]|speed])
 
 class Plotter:
     def __init__(self, port, baudrate):
