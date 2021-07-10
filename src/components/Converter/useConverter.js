@@ -187,7 +187,7 @@ export default function useConverter() {
           const secondSign = secondSpeedDiff / Math.abs(secondSpeedDiff);
           const secondBlockSize = (out.length - halfway) / Math.abs(secondSpeedDiff);
           for (let i = halfway; i < out.length; i++) {
-            out[i].s = (secondBaseSpeed + ( secondSign * Math.round(i / secondBlockSize) ));
+            out[i].s = (secondBaseSpeed + ( secondSign * Math.round((i - halfway) / secondBlockSize) ));
           }
 
         }
