@@ -121,7 +121,7 @@ export default function useConverter() {
 
             while (mm < total) {
               const newCoor = pointToCoor(path.getPointAtLength(mmToUnit(mm)))
-              const dist = distToLine(out[lag], out[lag+1], newCoor);
+              const dist = distToLine(out[lag].coor, out[lag+1].coor, newCoor);
 
               if (dist < precision) {
                 out[lag+1] = { speed: getSpeed( out[lag].coor, newCoor ), coor: newCoor };
