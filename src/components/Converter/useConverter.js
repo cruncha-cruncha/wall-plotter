@@ -304,7 +304,7 @@ export default function useConverter() {
           ? masterCoors.start.coor
           : masterCoors[`path-${i-1}`][masterCoors[`path-${i-1}`].length - 1].coor;
         
-        const end = masterCoors[`path-${i}`][0];
+        const end = masterCoors[`path-${i}`][0].coor;
 
         masterCoors[`path-${i}`][0].speed = getSpeed( start, end );
       }
