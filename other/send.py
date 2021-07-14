@@ -7,52 +7,43 @@ import os
 PORT = 'COM3'
 BAUDRATE = 9600
 
-# motors
-# L = left
-# R = right
-# steps
-# H = hold
-# L = longer
-# S = short
 COMMANDS = {
     "enable":  b'\xff',
-    "disable": b'\x88',
-    "LH,RH":   b'\x00',
-    "LH,RL":   b'\x01',
-    "LH,RS":   b'\x02',
-    "LL,RH":   b'\x10',
-    "LL,RL":   b'\x11',
-    "LL,RS":   b'\x12',
-    "LS,RH":   b'\x20',
-    "LS,RL":   b'\x21',
-    "LS,RS":   b'\x22',
+    "disable": b'\x88'
 }
 
-# 1  = longer
-# 0  = hold
-# -1 = shorter
 def stepToHex(step):
-    if (not 'l' in step) or (not 'r' in step):
-        return COMMANDS["LH,RH"]
+    if (not 's' in step) or (not 'l' in step) or (not 'r' in step):
+        # error
+        return COMMANDS["disable"]
     if step['l'] == 0 and step['r'] == 0:
-        return COMMANDS["LH,RH"]
-    elif step['l'] == 0 and step['r'] == 1:
-        return COMMANDS["LH,RL"]
+        # aka no-op
+        return COMMANDS["enable"]
+    
+    # 1  = longer
+    # 0  = hold
+    # -1 = shorter
+    motorDirections = None
+    if step['l'] == 0 and step['r'] == 1:
+        motorDirections = b'\x00'
     elif step['l'] == 0 and step['r'] == -1:
-        return COMMANDS["LH,RS"]
+        motorDirections = b'\x01'
     elif step['l'] == 1 and step['r'] == 0:
-        return COMMANDS["LL,RH"]
+        motorDirections = b'\x02'
     elif step['l'] == 1 and step['r'] == 1:
-        return COMMANDS["LL,RL"]
+        motorDirections = b'\x03'
     elif step['l'] == 1 and step['r'] == -1:
-        return COMMANDS["LL,RS"]
+        motorDirections = b'\x04'
     elif step['l'] == -1 and step['r'] == 0:
-        return COMMANDS["LS,RH"]
+        motorDirections = b'\x05'
     elif step['l'] == -1 and step['r'] == 1:
-        return COMMANDS["LS,RL"]
+        motorDirections = b'\x06'
     elif step['l'] == -1 and step['r'] == -1:
-        return COMMANDS["LS,RS"]
-    return COMMANDS["LH,RH"]
+        motorDirections = b'\x07'
+
+    speed = step['s'] << 3
+
+    return bytes([motorDirections[0]|speed])
 
 class Plotter:
     def __init__(self, port, baudrate):
@@ -166,7 +157,6 @@ class Run:
         with open(controller.input_file_path, 'r') as f:
             data = json.load(f)
 
-            steps_per_second = data["stepsPerSecond"]
             moves = data["pulses"]
 
             spare = len(moves) % self.chunk_size
@@ -212,15 +202,16 @@ class Manual:
         print(" q = back to standby")
         print()
 
+        default_speed = 3
         while True:
             if keyboard.is_pressed("k"):
-                controller.send(COMMANDS["LH,RL"])
+                controller.send(stepToHex({ "s": default_speed, "l": 0, "r": 1 }))
             elif keyboard.is_pressed("j"):
-                controller.send(COMMANDS["LH,RS"])
+                controller.send(stepToHex({ "s": default_speed, "l": 0, "r": -1 }))
             elif keyboard.is_pressed("f"):
-                controller.send(COMMANDS["LL,RH"])
+                controller.send(stepToHex({ "s": default_speed, "l": 1, "r": 0 }))
             elif keyboard.is_pressed("d"):
-                controller.send(COMMANDS["LS,RH"])
+                controller.send(stepToHex({ "s": default_speed, "l": -1, "r": 0 }))
             elif keyboard.is_pressed("q"):
                 input()
                 controller.setState(STATE["STANDBY"])  

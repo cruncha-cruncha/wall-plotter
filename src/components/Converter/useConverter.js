@@ -121,7 +121,7 @@ export default function useConverter() {
 
             while (mm < total) {
               const newCoor = pointToCoor(path.getPointAtLength(mmToUnit(mm)))
-              const dist = distToLine(out[lag], out[lag+1], newCoor);
+              const dist = distToLine(out[lag].coor, out[lag+1].coor, newCoor);
 
               if (dist < precision) {
                 out[lag+1] = { speed: getSpeed( out[lag].coor, newCoor ), coor: newCoor };
@@ -187,7 +187,7 @@ export default function useConverter() {
           const secondSign = secondSpeedDiff / Math.abs(secondSpeedDiff);
           const secondBlockSize = (out.length - halfway) / Math.abs(secondSpeedDiff);
           for (let i = halfway; i < out.length; i++) {
-            out[i].s = (secondBaseSpeed + ( secondSign * Math.round(i / secondBlockSize) ));
+            out[i].s = (secondBaseSpeed + ( secondSign * Math.round((i - halfway) / secondBlockSize) ));
           }
 
         }
@@ -304,7 +304,7 @@ export default function useConverter() {
           ? masterCoors.start.coor
           : masterCoors[`path-${i-1}`][masterCoors[`path-${i-1}`].length - 1].coor;
         
-        const end = masterCoors[`path-${i}`][0];
+        const end = masterCoors[`path-${i}`][0].coor;
 
         masterCoors[`path-${i}`][0].speed = getSpeed( start, end );
       }
